@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Creatore Squadre</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app-1.js" defer></script>
+    <script src="app-2.js" defer></script>
+    <script src="app-3.js" defer></script>
+    <script src="app-4.js" defer></script>
+    <script src="app-5.js" defer></script>
+    <script src="app-6.js" defer></script>
+    <script src="app-7.js" defer></script>
+    <script src="app-8.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <h1>Creatore Squadre</h1>
+          <p id="saveStatus">Database locale pronto</p>
+        </div>
+        <div class="summary-strip" aria-label="Riepilogo persone">
+          <div>
+            <span id="totalPeople">0</span>
+            <small>persone</small>
+          </div>
+          <div>
+            <span id="totalLeaders">0</span>
+            <small>leader</small>
+          </div>
+          <div>
+            <span id="selectedTodaySummary">0</span>
+            <small>presenti oggi</small>
+          </div>
+        </div>
+      </header>
+
+      <button id="birthdayBanner" class="birthday-banner" type="button" hidden>
+        <span>Compleanni della settimana</span>
+        <strong id="birthdayBannerNames"></strong>
+      </button>
+
+      <nav class="view-tabs" aria-label="Navigazione applicazione">
+        <button class="tab-button active" type="button" data-view="database">Database</button>
+        <button class="tab-button" type="button" data-view="create">Crea squadre</button>
+      </nav>
+
+      <main>
+        <section id="databaseView" class="app-view active-view" aria-label="Database persone">
+          <div class="database-layout">
+            <section class="panel person-panel" aria-labelledby="personTitle">
+              <div class="panel-title">
+                <h2 id="personTitle">Persona</h2>
+                <div class="score-preview">
+                  <span>Punteggio</span>
+                  <strong id="scorePreview">0</strong>
+                </div>
+              </div>
+
+              <form id="personForm" class="person-form">
+                <label>
+                  Nome
+                  <input id="firstName" name="firstName" type="text" autocomplete="given-name" required />
+                </label>
+
+                <label>
+                  Cognome / Nickname
+                  <input id="nickname" name="nickname" type="text" autocomplete="family-name" />
+                </label>
+
+                <label>
+                  Data di nascita
+                  <input id="birthDate" name="birthDate" type="date" />
+                </label>
+
+                <label>
+                  Periodo in chiesa
+                  <select id="churchPeriod" name="churchPeriod">
+                    <option value="under5">Meno di 5 anni (0)</option>
+                    <option value="fiveToTen">5-10 anni (1)</option>
+                    <option value="overTen">10+ anni (2)</option>
+                  </select>
+                </label>
+
+                <label>
+                  Lingua parlata
+                  <select id="language" name="language">
+                    <option value="chinese">Cinese</option>
+                    <option value="italian">Solo italiano</option>
+                    <option value="bilingual">Bilingue</option>
+                  </select>
+                </label>
+
+                <fieldset>
+                  <legend>Battezzato</legend>
+                  <label class="radio-row">
+                    <input type="radio" name="baptized" value="yes" />
+                    Sì
+                  </label>
+                  <label class="radio-row">
+                    <input type="radio" name="baptized" value="no" checked />
+                    No
+                  </label>
+                </fieldset>
+
+                <fieldset>
+                  <legend>Può essere leader</legend>
+                  <label class="radio-row">
+                    <input type="radio" name="leaderCandidate" value="yes" />
+                    Sì
+                  </label>
+                  <label class="radio-row">
+                    <input type="radio" name="leaderCandidate" value="no" checked />
+                    No
+                  </label>
+                </fieldset>
+
+                <label class="full-row">
+                  Note
+                  <textarea id="notes" name="notes" rows="3"></textarea>
+                </label>
+
+                <div class="form-actions">
+                  <button id="submitPerson" class="primary-button" type="submit">Aggiungi persona</button>
+                  <button id="cancelEdit" class="ghost-button" type="button" hidden>Annulla</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="panel database-panel" aria-labelledby="databaseTitle">
+              <div class="panel-title">
+                <div>
+                  <h2 id="databaseTitle">Database persone</h2>
+                  <p class="panel-subtitle">Qui salvi l'anagrafica generale. La presenza di oggi si sceglie nella schermata Crea squadre.</p>
+                </div>
+                <div class="button-group">
+                  <button id="downloadTemplate" class="ghost-button" type="button">Modello CSV</button>
+                  <button id="exportData" class="ghost-button" type="button">Esporta CSV</button>
+                  <button id="importData" class="ghost-button" type="button">Importa</button>
+                  <input
+                    id="importFile"
+                    type="file"
+                    accept=".csv,.json,.xls,.xlsx,text/csv,application/json,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    hidden
+                  />
+                  <button id="loadExamples" class="ghost-button" type="button">Dati esempio</button>
+                  <button id="clearPeople" class="danger-button" type="button">Svuota</button>
+                </div>
+              </div>
+
+              <div class="database-tools" aria-label="Strumenti database">
+                <label class="search-box database-search">
+                  Cerca nel database
+                  <input id="databaseSearch" type="search" placeholder="Nome, nickname o note" autocomplete="off" />
+                </label>
+                <div class="database-selection-actions">
+                  <span id="databaseSelectedCount" class="selection-count">0 selezionati</span>
+                  <button id="selectVisibleDatabase" class="ghost-button" type="button">Seleziona risultati</button>
+                  <button id="clearDatabaseSelection" class="ghost-button" type="button">Deseleziona</button>
+                  <button id="deleteSelectedPeople" class="danger-button" type="button">Elimina selezionati</button>
+                </div>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="select-col">Sel.</th>
+                      <th>Nome</th>
+                      <th>Nascita</th>
+                      <th>Lingua</th>
+                      <th>Chiesa</th>
+                      <th>Batt.</th>
+                      <th>Leader</th>
+                      <th>Punti</th>
+                      <th>Azioni</th>
+                    </tr>
+                  </thead>
+                  <tbody id="peopleRows"></tbody>
+                </table>
+                <div id="emptyPeople" class="empty-state">Nessuna persona salvata</div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section id="createView" class="app-view" aria-label="Crea squadre">
+          <div class="create-layout">
+            <section class="panel attendance-panel" aria-labelledby="attendanceTitle">
+              <div class="panel-title">
+                <div>
+                  <h2 id="attendanceTitle">Presenti oggi</h2>
+                  <p class="panel-subtitle">Seleziona dal database solo le persone presenti. Le squadre saranno create usando questa lista.</p>
+                </div>
+                <div class="button-group">
+                  <button id="selectAllToday" class="ghost-button" type="button">Tutti presenti</button>
+                  <button id="clearToday" class="ghost-button" type="button">Nessuno</button>
+                </div>
+              </div>
+
+              <div class="attendance-stats">
+                <div>
+                  <span id="selectedPeopleCount">0</span>
+                  <small>presenti</small>
+                </div>
+                <div>
+                  <span id="selectedLeadersCount">0</span>
+                  <small>leader oggi</small>
+                </div>
+                <div>
+                  <span id="selectedScoreTotal">0</span>
+                  <small>punti totali</small>
+                </div>
+              </div>
+
+              <label class="search-box">
+                Cerca persona
+                <input id="attendanceSearch" type="search" placeholder="Nome o nickname" autocomplete="off" />
+              </label>
+
+              <div id="attendanceList" class="attendance-list"></div>
+              <div id="emptyAttendance" class="empty-state">Aggiungi persone nel database per scegliere i presenti.</div>
+            </section>
+
+            <section class="panel generator-panel" aria-labelledby="generatorTitle">
+              <div class="panel-title">
+                <h2 id="generatorTitle">Regia generazione</h2>
+                <span id="runState" class="state-pill">Fermo</span>
+              </div>
+
+              <label>
+                Numero squadre
+                <input id="teamCount" type="number" min="2" value="2" />
+              </label>
+
+              <div id="generationStatus" class="generation-status" role="status"></div>
+
+              <div class="control-grid">
+                <button id="startDraw" class="primary-button impact-button" type="button">Inizio full screen</button>
+                <button id="stopDraw" class="stop-button" type="button" disabled>Stop</button>
+              </div>
+
+              <button id="generateOnce" class="ghost-button" type="button">Genera una volta</button>
+              <button id="languageBalanceToggle" class="ghost-button toggle-button" type="button" aria-pressed="false">
+                Dividi per lingua
+              </button>
+
+              <div class="metric-list" aria-label="Controlli formazione">
+                <div>
+                  <span id="neededLeaders">2</span>
+                  <small>leader richiesti</small>
+                </div>
+                <div>
+                  <span id="scoreGap">0</span>
+                  <small>differenza punti</small>
+                </div>
+                <div>
+                  <span id="sizeGap">0</span>
+                  <small>differenza persone</small>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <section class="results-band" aria-labelledby="resultsTitle">
+            <div class="results-head">
+              <div>
+                <h2 id="resultsTitle">Formazione squadre</h2>
+                <p id="resultMeta">Scegli i presenti e premi Inizio full screen.</p>
+              </div>
+            </div>
+            <div id="teamsGrid" class="teams-grid"></div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <section id="drawOverlay" class="draw-overlay" aria-hidden="true" aria-labelledby="overlayTitle">
+      <div class="draw-stage">
+        <header class="draw-header">
+          <div>
+            <p id="drawCounter" class="draw-counter">Combinazione 0</p>
+            <h2 id="overlayTitle">Le squadre stanno girando</h2>
+          </div>
+          <button id="closeOverlay" class="overlay-close" type="button">Esci</button>
+        </header>
+        <div id="overlayTeamsGrid" class="overlay-teams-grid"></div>
+        <button id="overlayStop" class="mega-stop" type="button">STOP</button>
+      </div>
+    </section>
+
+    <section id="birthdayOverlay" class="birthday-overlay" aria-hidden="true" aria-labelledby="birthdayOverlayTitle">
+      <div class="birthday-stage">
+        <button id="closeBirthdayOverlay" class="overlay-close birthday-close" type="button">Chiudi</button>
+        <div class="confetti-row" aria-hidden="true">🎉 🎂 ✨ 🥳 🎈</div>
+        <h2 id="birthdayOverlayTitle">Buon compleanno!</h2>
+        <p id="birthdayWindowText"></p>
+        <div id="birthdayPeople" class="birthday-people"></div>
+        <div class="confetti-row" aria-hidden="true">🎊 💛 🙌 🎁 ✨</div>
+      </div>
+    </section>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
